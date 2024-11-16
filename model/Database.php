@@ -1,43 +1,46 @@
 <?php
 
-
     class Database{
 
-        private $hostname;
-        private $username;
-        private $password;
-        private $dbname;
-        private $conn = null;
+        public $hostname;
+        public $username;
+        public $password;
+        public $dbname = 'prefeitura';
 
-        public function __construct($_hostname, $_username, $_password, $_dbname){
+        public function __construct($_hostname, $_username, $_password){
 
             $this->hostname = $_hostname;
             $this->username = $_username;
             $this->password = $_password;
-            $this->dbname = $_dbname;
         }
-    
-        public function conectar(){
-    
-            if($this->conn === null){
-                $this->conn = new mysqli($this->hostname,$this->username,$this->password);
-        
-                if($this->conn->connect_error){
-                    die("Erro na conexão: " . $this->conn->connect_error);
-                }
+
+        public function construirDatabase(){
+
+            $conn = new mysqli($this->hostname, $this->username, $this->password);
+            if ($conn->connect_error) {
+                die("Erro na conexão: " . $conn->connect_error);
             }
-    
-            return $this->conn;
-        }
+            
+            $sql = "CREATE DATABASE IF NOT EXISTS prefeitura";
+            $conn->query($sql);
 
-        public function getDbname(){
-            return $this->dbname;
+            $conn->select_db('prefeitura');
+
+            $sql = "CREATE TABLE IF NOT EXISTS solicitacoes (
+
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                nome_solicitante VARCHAR(100) NOT NULL,
+                tipo_servico VARCHAR(100) NOT NULL,
+                descricao TEXT NOT NULL, 
+                data_solicitacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                status VARCHAR(20) NOT NULL
+            )";
+
+            $conn->query($sql);
+            $conn->close();
+
         }
-    
     }
-
-
-
 
 
 ?>
